@@ -1,0 +1,102 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "chunky"
+version = "0.1.0"
+description = "Semantic chunking utilities for scientific code and documentation corpora."
+readme = "README.md"
+authors = [
+  { name = "Nancy Brain Contributors" }
+]
+license = { file = "LICENSE" }
+requires-python = ">=3.8"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Text Processing :: Linguistic",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7",
+  "pytest-cov>=4",
+  "coverage[toml]>=7",
+  "ruff>=0.6",
+  "bump-my-version>=0.6",
+]
+docs = [
+  "sphinx>=7",
+  "myst-parser>=2",
+  "furo>=2024.0.0",
+]
+
+[project.urls]
+Home = "https://github.com/AmberLee2427/chunky"
+Documentation = "https://chunky.readthedocs.io/"
+Issues = "https://github.com/AmberLee2427/chunky/issues"
+
+[tool.hatch.version]
+path = "src/chunky/__about__.py"
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "docs", "README.md", "LICENSE", "SEMANTIC_CHUNKER.md"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/chunky"]
+
+[tool.hatch.envs.default]
+dependencies = [
+  "pytest",
+]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra --showlocals --strict-markers --strict-config"
+testpaths = [
+  "tests",
+]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+select = [
+  "E",
+  "F",
+  "I",
+  "B",
+]
+ignore = [
+  "E203",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.bumpversion]
+current_version = "0.1.0"
+commit = true
+message = "chore: bump version to {new_version}"
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = "version = \"{current_version}\""
+replace = "version = \"{new_version}\""
+
+[[tool.bumpversion.files]]
+filename = "src/chunky/__about__.py"
+search = "__version__ = \"{current_version}\""
+replace = "__version__ = \"{new_version}\""
