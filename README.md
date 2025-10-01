@@ -5,11 +5,42 @@ It provides a modular pipeline that powers the Nancy Brain knowledge base and MC
 while remaining useful as a standalone library for retrieval systems that need deterministic,
 metadata-rich chunks.
 
+## Highlights
+
+- Deterministic baseline chunking with overlap-aware windowing that works for any text file.
+- Registry-driven architecture so language-specific chunkers can be added without touching callers.
+- Rich metadata (`chunk_id`, `line_start`, `line_end`, character spans) ready for downstream RAG and citation tooling.
+- Batteries-included tooling: Hatchling builds, Ruff linting, pytest coverage, Sphinx docs, and automated releases to PyPI + Read the Docs.
+
+## Quick Start
+
+```python
+from pathlib import Path
+
+from chunky import ChunkPipeline, ChunkerConfig
+
+pipeline = ChunkPipeline()
+config = ChunkerConfig(lines_per_chunk=80, line_overlap=10)
+
+chunks = pipeline.chunk_file(Path("path/to/file.py"), config=config)
+
+for chunk in chunks[:2]:
+    print(chunk.chunk_id, chunk.metadata["line_start"], chunk.metadata["line_end"])
+```
+
+See the [design notes](docs/design/SEMANTIC_CHUNKER.md) for the roadmap toward language-aware and embedding-driven chunkers.
+
 Documentation lives on Read the Docs: <https://chunky.readthedocs.io>
 
 ## Installation
 
-Install from source using the `pyproject.toml` metadata:
+Install from PyPI:
+
+```bash
+pip install chunky-files
+```
+
+Or install from source using the `pyproject.toml` metadata:
 
 ```bash
 # clone the repo (if you haven't already)

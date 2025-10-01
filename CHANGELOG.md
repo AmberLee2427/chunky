@@ -7,12 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.2.2] - TBD
+## [0.2.2] - 2025-09-30
 
 ### Fixed
-- Updated release workflow to pin the latest PyPI publish action and add a `twine check`, resolving bogus 'Missing Name/Version' errors during automated releases.
+- Pinned the release workflow to `pypa/gh-action-pypi-publish@release/v1` and added a `twine check` gate, eliminating spurious "missing Name/Version" errors during automated publishes.
+- Corrected the Sphinx intersphinx configuration so Read the Docs builds resolve the Python inventory without manual tweaks.
 
-## [0.2.1] - TBD
+## [0.2.1] - 2025-09-30
+
+### Changed
+- Renamed the published distribution to `chunky-files` and refreshed packaging metadata for the new name.
+
+### Fixed
+- Ensured `pyproject.toml` ships in the sdist include list to keep build metadata intact across platforms.
 
 ## [0.2.0] - TBD
 ### Added
