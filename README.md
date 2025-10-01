@@ -32,7 +32,7 @@ pip install -e ".[dev,docs]"
 
 ## Tooling
 
-* **Code style:** Ruff (`ruff check src tests`)
+* **Code style:** Ruff (`ruff check src tests` or `ruff check src tests --fix`)
 * **Tests:** Pytest (`pytest --cov=chunky`)
 * **Docs:** Sphinx + MyST + Furo (`sphinx-build -b html docs docs/_build/html`)
 * **Packaging:** Hatchling build backend

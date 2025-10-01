@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 
-@dataclass(slots=True)
+@dataclass
 class Document:
     """Normalized representation of a file to be chunked."""
 
@@ -17,7 +17,7 @@ class Document:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass(slots=True)
+@dataclass
 class Chunk:
     """A chunk of text ready for downstream indexing."""
 
@@ -27,7 +27,7 @@ class Chunk:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass(slots=True)
+@dataclass
 class ChunkerConfig:
     """Configuration shared across chunkers."""
 
