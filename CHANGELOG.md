@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Updated release workflow to pin the latest PyPI publish action and add a `twine check`, resolving bogus 'Missing Name/Version' errors during automated releases.
+
 ## [0.2.1] - TBD
 
 ## [0.2.0] - TBD

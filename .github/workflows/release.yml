@@ -25,7 +25,7 @@ jobs:
       - name: Install build tooling
         run: |
           python -m pip install --upgrade pip
-          pip install .[dev,docs]
+          python -m pip install build hatchling twine
 
       - name: Verify version tag matches project
         run: |
@@ -55,15 +55,11 @@ jobs:
         run: ls -l dist/
         working-directory: ${{ github.workspace }}
 
-      - name: Inspect wheel metadata
-        run: pip install dist/*.whl && pip show chunky-files
-        working-directory: ${{ github.workspace }}
-
-      - name: Inspect sdist metadata
-        run: tar -tzf dist/*.tar.gz | grep 'METADATA\|PKG-INFO'
+      - name: Verify metadata with Twine
+        run: python -m twine check dist/*
         working-directory: ${{ github.workspace }}
 
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.9.0
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_TOKEN }}

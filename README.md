@@ -52,9 +52,11 @@ Release checklist:
 1. Review and update `CHANGELOG.md`, keeping the `[Unreleased]` section accurate.
 2. Run `bump-my-version bump <part>` to update version metadata and append a dated entry in the
    changelog.
-3. Commit the changes and push to `main`.
-4. Tag the commit (`git tag vX.Y.Z && git push origin vX.Y.Z`) to trigger the Release workflow.
-5. Verify the PyPI publish job and Read the Docs build succeed.
+3. Build distributions locally (`rm -rf dist && python -m build`) and verify metadata with
+   `python -m twine check dist/*`.
+4. Commit the changes and push to `main`.
+5. Tag the commit (`git tag vX.Y.Z && git push origin vX.Y.Z`) to trigger the Release workflow.
+6. Verify the PyPI publish job and Read the Docs build succeed.
 
 ## Contributing
 
