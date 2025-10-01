@@ -37,7 +37,7 @@ html_theme = os.environ.get("SPHINX_HTML_THEME", "furo")
 html_static_path = ["_static"]
 
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", {}),
+    "python": ("https://docs.python.org/3", "https://docs.python.org/3/objects.inv"),
 }
 
 myst_enable_extensions = [
