@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 from pathlib import Path
 from typing import Iterable, MutableMapping
 
@@ -16,7 +15,13 @@ class ChunkerRegistry:
         self._registry: MutableMapping[str, Chunker] = {}
         self._fallback: Chunker | None = None
 
-    def register(self, extensions: Iterable[str] | str, chunker: Chunker, *, overwrite: bool = False) -> None:
+    def register(
+        self,
+        extensions: Iterable[str] | str,
+        chunker: Chunker,
+        *,
+        overwrite: bool = False,
+    ) -> None:
         """Register a chunker for one or more extensions."""
 
         if isinstance(extensions, str):

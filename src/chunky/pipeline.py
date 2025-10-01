@@ -6,10 +6,9 @@ from pathlib import Path
 from typing import Optional
 
 from .chunkers import SlidingWindowChunker
-
+from .loaders import DEFAULT_LOADER, DocumentLoader
 from .registry import DEFAULT_REGISTRY, ChunkerRegistry
 from .types import Chunk, ChunkerConfig, Document
-from .loaders import DEFAULT_LOADER, DocumentLoader
 
 
 class ChunkPipeline:
@@ -25,7 +24,12 @@ class ChunkPipeline:
         self.loader = loader or DEFAULT_LOADER
         self._ensure_fallback()
 
-    def chunk_file(self, path: Path | str, *, config: Optional[ChunkerConfig] = None) -> list[Chunk]:
+    def chunk_file(
+        self,
+        path: Path | str,
+        *,
+        config: Optional[ChunkerConfig] = None,
+    ) -> list[Chunk]:
         """Chunk a file from disk."""
 
         config = config or ChunkerConfig()

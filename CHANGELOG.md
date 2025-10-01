@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.env` and other common evironment file name added to the `.gitignore` for token security. 
 ### Changes
 - Release workflow updated to have matching secrets name.
+### Fixes
+- Updated dependencies and improve type hints in codebase (ruff compliance).
+- Update build tooling installation in release .
+- Included pyproject.toml in sdist build targets.
 
 ## [0.1.0] - 2025-09-30
 ### Added
