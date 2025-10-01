@@ -47,6 +47,15 @@ pip install -e ".[dev,docs]"
 * Read the Docs builds the documentation automatically for pushes to the default branch. Local
   builds use `sphinx-build -b html docs docs/_build/html`.
 
+Release checklist:
+
+1. Review and update `CHANGELOG.md`, keeping the `[Unreleased]` section accurate.
+2. Run `bump-my-version bump <part>` to update version metadata and append a dated entry in the
+   changelog.
+3. Commit the changes and push to `main`.
+4. Tag the commit (`git tag vX.Y.Z && git push origin vX.Y.Z`) to trigger the Release workflow.
+5. Verify the PyPI publish job and Read the Docs build succeed.
+
 ## Contributing
 
 * Know your audience: most contributors will be scientific coders. Write docs assuming limited
