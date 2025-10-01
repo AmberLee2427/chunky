@@ -51,6 +51,10 @@ jobs:
         run: python -m build
         working-directory: ${{ github.workspace }}
 
+        - name: List dist contents
+          run: ls -l dist/
+          working-directory: ${{ github.workspace }}
+
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@v1.9.0
         with:
