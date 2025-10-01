@@ -3,7 +3,7 @@ requires = ["hatchling>=1.25"]
 build-backend = "hatchling.build"
 
 [project]
-name = "chunky"
+name = "chunky-files"
 version = "0.2.0"
 description = "Semantic chunking utilities for scientific code and documentation corpora."
 readme = "README.md"
