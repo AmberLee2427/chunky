@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Optional
 
 from .chunkers import SlidingWindowChunker
-from .core import Chunker
+
 from .registry import DEFAULT_REGISTRY, ChunkerRegistry
 from .types import Chunk, ChunkerConfig, Document
 from .loaders import DEFAULT_LOADER, DocumentLoader
@@ -35,7 +35,7 @@ class ChunkPipeline:
 
     def chunk_documents(
         self,
-        documents: Iterable[Document],
+        documents: list[Document],
         *,
         config: Optional[ChunkerConfig] = None,
     ) -> list[Chunk]:

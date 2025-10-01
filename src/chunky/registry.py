@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from collections import defaultdict
+
 from pathlib import Path
-from typing import Dict, Iterable, MutableMapping, Type
+from typing import Iterable, MutableMapping
 
 from .core import Chunker
 

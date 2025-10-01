@@ -36,6 +36,7 @@ dev = [
   "coverage[toml]>=7",
   "ruff>=0.6",
   "bump-my-version>=0.6",
+  "build"
 ]
 docs = [
   "sphinx>=7",
@@ -76,18 +77,14 @@ testpaths = [
   "tests",
 ]
 
+
 [tool.ruff]
 line-length = 100
 src = ["src", "tests"]
-select = [
-  "E",
-  "F",
-  "I",
-  "B",
-]
-ignore = [
-  "E203",
-]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+ignore = ["E203"]
 
 [tool.ruff.format]
 quote-style = "double"

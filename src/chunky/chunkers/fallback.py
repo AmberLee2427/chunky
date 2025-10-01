@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+
 from pathlib import Path
-from typing import Iterable
 
 from ..core import Chunker
 from ..types import Chunk, ChunkerConfig, Document
