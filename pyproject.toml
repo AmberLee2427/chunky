@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "chunky-files"
-version = "0.2.2"
+version = "0.3.0"
 description = "Semantic chunking utilities for scientific code and documentation corpora."
 readme = "README.md"
 authors = [
@@ -91,7 +91,7 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.bumpversion]
-current_version = "0.2.2"
+current_version = "0.3.0"
 commit = true
 message = "chore: bump version to {new_version}"
 

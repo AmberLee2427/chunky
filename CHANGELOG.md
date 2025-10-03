@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - TBD
+
 ### Added
 - Language-aware chunkers for Python, Markdown, JSON/YAML, and plain text with metadata-rich outputs.
 - Registry bootstrap that pre-registers the built-in chunkers for common extensions.
