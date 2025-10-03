@@ -7,11 +7,11 @@ metadata-rich chunks.
 
 ## Highlights
 
-- Deterministic baseline chunking with overlap-aware windowing that works for any text file.
+- Deterministic sliding-window fallback that keeps progress even on unknown file types.
 - Registry-driven architecture so language-specific chunkers can be added without touching callers.
 - Rich metadata (`chunk_id`, `line_start`, `line_end`, character spans) ready for downstream RAG and citation tooling.
+- Language-aware chunkers for Python, Markdown, YAML/JSON config, plain text, Fortran, and (via Tree-sitter) C/C++/HTML/Bash.
 - Batteries-included tooling: Hatchling builds, Ruff linting, pytest coverage, Sphinx docs, and automated releases to PyPI + Read the Docs.
-- Language-aware chunkers for Python, Markdown, YAML/JSON config, and plain text with automatic fallback to sliding windows.
 
 ## Quick Start
 
@@ -38,7 +38,9 @@ Documentation lives on Read the Docs: <https://chunky.readthedocs.io>
 * `PythonSemanticChunker` — splits modules on top-level functions/classes and groups leftover module context.
 * `MarkdownHeadingChunker` — emits chunks per heading while keeping the optional intro section.
 * `JSONYamlChunker` — slices configs by top-level keys/items and falls back gracefully when parsing fails.
-* `PlainTextChunker` — groups blank-line-separated paragraphs; other files drop to the sliding-window fallback.
+* `PlainTextChunker` — groups blank-line-separated paragraphs before falling back to sliding windows.
+* `FortranChunker` — captures subroutine/function/program blocks.
+* Tree-sitter chunkers (optional extra) for C/C++, HTML, Bash, and other structural languages.
 * `SlidingWindowChunker` — deterministic line windows with overlap when no specialised handler is available.
 
 ## Installation
@@ -66,9 +68,16 @@ For development and documentation builds, install the optional extras:
 pip install -e ".[dev,docs]"
 ```
 
+To enable Tree-sitter powered chunkers for C/C++/HTML/Bash (and other supported grammars), install:
+
+```bash
+pip install chunky-files[tree]
+```
+
+This extra pins `tree-sitter==0.20.1` alongside the bundled `tree-sitter-languages` so the shipped grammar binaries load correctly.
+
 > `-e` performs an editable install so local changes reflect immediately.
-> `.[dev,docs]` installs the tooling declared under the `dev` and `docs` extras in
-> `pyproject.toml`.
+> `.[dev,docs]` installs the tooling declared under the `dev` and `docs` extras in `pyproject.toml`.
 
 ## Tooling
 

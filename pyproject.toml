@@ -36,12 +36,17 @@ dev = [
   "coverage[toml]>=7",
   "ruff>=0.6",
   "bump-my-version>=0.6",
-  "build"
+  "tree-sitter==0.20.1",
+  "tree-sitter-languages>=1.10.2",
 ]
 docs = [
   "sphinx>=7",
   "myst-parser>=2",
   "furo>=2024.0.0",
+]
+tree = [
+  "tree-sitter==0.20.1",
+  "tree-sitter-languages>=1.10.2",
 ]
 
 [project.urls]
@@ -54,12 +59,11 @@ path = "src/chunky/__about__.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
-  "src/**",
-  "docs/**",
+  "src",
+  "docs",
   "README.md",
   "LICENSE",
   "CHANGELOG.md",
-  "pyproject.toml",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -68,6 +72,8 @@ packages = ["src/chunky"]
 [tool.hatch.envs.default]
 dependencies = [
   "pytest",
+  "tree-sitter==0.20.1",
+  "tree-sitter-languages>=1.10.2",
 ]
 
 [tool.pytest.ini_options]
@@ -76,7 +82,9 @@ addopts = "-ra --showlocals --strict-markers --strict-config"
 testpaths = [
   "tests",
 ]
-
+pythonpath = [
+  "src",
+]
 
 [tool.ruff]
 line-length = 100
@@ -104,7 +112,7 @@ replace = "version = \"{new_version}\""
 filename = "src/chunky/__about__.py"
 search = "__version__ = \"{current_version}\""
 replace = "__version__ = \"{new_version}\""
- 
+
 [[tool.bumpversion.files]]
 filename = "CHANGELOG.md"
 search = "## [Unreleased]"

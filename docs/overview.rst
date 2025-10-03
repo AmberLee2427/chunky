@@ -53,6 +53,8 @@ Built-in chunkers
 * ``MarkdownHeadingChunker`` — groups content per heading while keeping introductory prose.
 * ``JSONYamlChunker`` — slices structured configs by their first-level keys/items and falls back if parsing fails.
 * ``PlainTextChunker`` — groups blank-line separated paragraphs before falling back to sliding windows.
+* ``FortranChunker`` — captures `program`, `subroutine`, and `function` blocks with minimal heuristics.
+* Tree-sitter chunkers (optional extra) for C/C++/HTML/Bash when the `tree` extra is installed.
 * ``SlidingWindowChunker`` — deterministic line windows with configurable overlap.
 
 Roadmap

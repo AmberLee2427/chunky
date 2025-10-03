@@ -5,7 +5,17 @@ from __future__ import annotations
 import textwrap
 from pathlib import Path
 
+import pytest
+
 from chunky import ChunkerConfig, ChunkPipeline
+
+try:  # optional Tree-sitter support
+    from tree_sitter_languages import get_language  # type: ignore
+
+    get_language("c")
+    _TREE_SITTER_AVAILABLE = True
+except Exception:  # pragma: no cover - optional dependency missing
+    _TREE_SITTER_AVAILABLE = False
 
 
 def _write(path: Path, content: str) -> Path:
@@ -134,3 +144,91 @@ def test_fallback_for_invalid_json(tmp_path: Path) -> None:
 
     assert chunks[0].text
     assert chunks[0].metadata.get("chunk_type") != "json_object"
+
+
+@pytest.mark.skipif(not _TREE_SITTER_AVAILABLE, reason="tree-sitter not installed")
+def test_c_tree_sitter_chunker(tmp_path: Path) -> None:
+    content = textwrap.dedent(
+        """
+        int add(int a, int b) {
+            return a + b;
+        }
+
+        static int helper(void) {
+            return 42;
+        }
+        """
+    ).strip()
+    path = _write(tmp_path / "file.c", content)
+
+    pipeline = ChunkPipeline()
+    chunks = pipeline.chunk_file(path)
+
+    assert len(chunks) == 2
+    assert all(chunk.metadata.get("chunk_type") == "c" for chunk in chunks)
+
+
+@pytest.mark.skipif(not _TREE_SITTER_AVAILABLE, reason="tree-sitter not installed")
+def test_html_tree_sitter_chunker(tmp_path: Path) -> None:
+    content = textwrap.dedent(
+        """
+        <html>
+          <body>
+            <section><p>One</p></section>
+            <section><p>Two</p></section>
+          </body>
+        </html>
+        """
+    ).strip()
+    path = _write(tmp_path / "index.html", content)
+
+    pipeline = ChunkPipeline()
+    chunks = pipeline.chunk_file(path)
+
+    assert len(chunks) >= 2
+    assert all(chunk.metadata.get("chunk_type") == "html" for chunk in chunks)
+
+
+def test_fortran_chunker_identifies_subroutines(tmp_path: Path) -> None:
+    content = textwrap.dedent(
+        """
+        program demo
+        call hello()
+        end
+
+        subroutine hello()
+        write (*,*) 'hi'
+        end
+        """
+    ).strip()
+    path = _write(tmp_path / "example.f90", content)
+
+    pipeline = ChunkPipeline()
+    chunks = pipeline.chunk_file(path)
+
+    assert len(chunks) == 2
+    assert all(chunk.metadata.get("chunk_type") == "fortran" for chunk in chunks)
+
+
+@pytest.mark.skipif(not _TREE_SITTER_AVAILABLE, reason="tree-sitter not installed")
+def test_bash_tree_sitter_chunker(tmp_path: Path) -> None:
+    content = textwrap.dedent(
+        """
+        #!/bin/bash
+
+        greet() {
+          echo "hi"
+        }
+
+        build() {
+          echo "building"
+        }
+        """
+    ).strip()
+    path = _write(tmp_path / "script.sh", content)
+
+    pipeline = ChunkPipeline()
+    chunks = pipeline.chunk_file(path)
+
+    assert len(chunks) == 2
+    assert all(chunk.metadata.get("chunk_type") == "bash" for chunk in chunks)

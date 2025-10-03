@@ -7,15 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.0] - TBD
-
 ### Added
-- Language-aware chunkers for Python, Markdown, JSON/YAML, and plain text with metadata-rich outputs.
+- Language-aware chunkers for Python, Markdown, JSON/YAML, plain text, Fortran, and Tree-sitter powered C/C++/HTML/Bash support.
+- Optional `tree` extra now installs `tree-sitter==0.20.1` plus the bundled grammars so pre-built parsers load reliably.
+
+## [0.3.0] - 2025-10-02
+
 - Registry bootstrap that pre-registers the built-in chunkers for common extensions.
 - Unit tests covering the new chunkers and regression coverage for the sliding-window fallback.
 
 ## [0.2.2] - 2025-09-30
-
 ### Fixed
 - Pinned the release workflow to `pypa/gh-action-pypi-publish@release/v1` and added a `twine check` gate, eliminating spurious "missing Name/Version" errors during automated publishes.
 - Corrected the Sphinx intersphinx configuration so Read the Docs builds resolve the Python inventory without manual tweaks.
