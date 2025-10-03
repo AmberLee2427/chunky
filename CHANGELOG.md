@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.4.0] - TBD
+## [0.4.0] - 2025-10-03
 
 ### Added
 - Language-aware chunkers for Python, Markdown, JSON/YAML, plain text, Fortran, and Tree-sitter powered C/C++/HTML/Bash support.
