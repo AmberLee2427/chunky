@@ -78,7 +78,9 @@ class PythonSemanticChunker(Chunker):
         return chunks
 
     @staticmethod
-    def _approximate_end(node: ast.AST, siblings: List[ast.AST], index: int, line_count: int) -> Optional[int]:
+    def _approximate_end(
+        node: ast.AST, siblings: List[ast.AST], index: int, line_count: int
+    ) -> Optional[int]:
         """Best-effort end line when AST node lacks ``end_lineno``."""
 
         for sibling in siblings[index + 1 :]:

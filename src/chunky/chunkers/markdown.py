@@ -72,7 +72,9 @@ class MarkdownHeadingChunker(Chunker):
         return [seg for seg in sections if seg[0] < seg[1]]
 
     @staticmethod
-    def _merge_small_sections(sections: List[Tuple[int, int]], min_lines: int) -> List[Tuple[int, int]]:
+    def _merge_small_sections(
+        sections: List[Tuple[int, int]], min_lines: int
+    ) -> List[Tuple[int, int]]:
         if len(sections) <= 1:
             return sections
 

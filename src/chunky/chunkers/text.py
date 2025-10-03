@@ -63,7 +63,9 @@ class PlainTextChunker(Chunker):
         return paragraphs
 
     @staticmethod
-    def _combine_by_window(paragraphs: List[tuple[int, int]], max_lines: int) -> List[tuple[int, int]]:
+    def _combine_by_window(
+        paragraphs: List[tuple[int, int]], max_lines: int
+    ) -> List[tuple[int, int]]:
         if max_lines <= 0:
             return paragraphs
 
