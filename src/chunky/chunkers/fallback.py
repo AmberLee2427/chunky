@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from ..core import Chunker
-from ..types import Chunk, ChunkerConfig, Document
+from ..types import ChunkerConfig, Document
+from ._common import compute_line_boundaries, make_chunk
 
 
 class SlidingWindowChunker(Chunker):
@@ -17,35 +16,23 @@ class SlidingWindowChunker(Chunker):
         overlap = config.clamp_overlap(config.line_overlap, window)
 
         if not lines:
-            chunk_id = self._build_chunk_id(document.path, 0)
-            return [
-                Chunk(
-                    chunk_id=chunk_id,
-                    text="",
-                    source_document=document.path,
-                    metadata=self._chunk_metadata(
-                        chunk_index=0,
-                        line_start=0,
-                        line_end=0,
-                        span_start=0,
-                        span_end=0,
-                        config=config,
-                    ),
-                )
-            ]
+            chunk = make_chunk(
+                document=document,
+                lines=[""],
+                start_line=0,
+                end_line=1,
+                chunk_index=0,
+                config=config,
+                line_starts=[0],
+                line_ends=[0],
+            )
+            chunk.metadata.update({"line_start": 0, "line_end": 0})
+            return [chunk]
 
         chunks: list[Chunk] = []
         line_count = len(lines)
         # Pre-compute character offsets once to avoid quadratic scans.
-        line_starts: list[int] = []
-        line_ends: list[int] = []
-        cursor = 0
-        for idx, line in enumerate(lines):
-            if idx > 0:
-                cursor += 1  # newline preceding this line
-            line_starts.append(cursor)
-            cursor += len(line)
-            line_ends.append(cursor)
+        line_starts, line_ends = compute_line_boundaries(lines)
 
         start_line = 0
         chunk_index = 0
@@ -53,23 +40,16 @@ class SlidingWindowChunker(Chunker):
         while start_line < line_count:
             previous_start = start_line
             end_line = min(start_line + window, line_count)
-            text = "\n".join(lines[start_line:end_line])
-            chunk_id = self._build_chunk_id(document.path, chunk_index)
-            metadata = self._chunk_metadata(
-                chunk_index=chunk_index,
-                line_start=start_line + 1,
-                line_end=end_line,
-                span_start=line_starts[start_line],
-                span_end=line_ends[end_line - 1],
-                config=config,
-            )
-
             chunks.append(
-                Chunk(
-                    chunk_id=chunk_id,
-                    text=text,
-                    source_document=document.path,
-                    metadata=metadata,
+                make_chunk(
+                    document=document,
+                    lines=lines,
+                    start_line=start_line,
+                    end_line=end_line,
+                    chunk_index=chunk_index,
+                    config=config,
+                    line_starts=line_starts,
+                    line_ends=line_ends,
                 )
             )
 
@@ -86,27 +66,3 @@ class SlidingWindowChunker(Chunker):
             start_line = next_start
 
         return chunks
-
-    @staticmethod
-    def _build_chunk_id(path: Path, index: int) -> str:
-        return f"{path}::chunk-{index}"
-
-    @staticmethod
-    def _chunk_metadata(
-        chunk_index: int,
-        line_start: int,
-        line_end: int,
-        span_start: int,
-        span_end: int,
-        config: ChunkerConfig,
-    ) -> dict[str, int | str]:
-        metadata: dict[str, int | str] = {
-            "chunk_index": chunk_index,
-            "line_start": line_start,
-            "line_end": line_end,
-            "span_start": span_start,
-            "span_end": span_end,
-        }
-        if config.metadata:
-            metadata.update(config.metadata)
-        return metadata

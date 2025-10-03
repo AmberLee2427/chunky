@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Language-aware chunkers for Python, Markdown, JSON/YAML, and plain text with metadata-rich outputs.
+- Registry bootstrap that pre-registers the built-in chunkers for common extensions.
+- Unit tests covering the new chunkers and regression coverage for the sliding-window fallback.
+
 ## [0.2.2] - 2025-09-30
 
 ### Fixed

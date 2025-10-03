@@ -12,9 +12,14 @@ Nancy Brain's MCP-backed retrieval workflows.
 Getting Started
 ---------------
 
-Install the package from source:
+Install the package from PyPI or from source:
 
 .. code-block:: bash
+
+   pip install chunky-files
+
+.. code-block:: bash
+   :caption: from source
 
    git clone https://github.com/AmberLee2427/chunky.git
    cd chunky
@@ -40,6 +45,15 @@ First chunks via the pipeline:
 
    for chunk in chunks:
        print(chunk.chunk_id, chunk.metadata["line_start"], chunk.metadata["line_end"])
+
+Built-in chunkers
+------------------
+
+* ``PythonSemanticChunker`` — splits modules on top-level functions/classes and captures remaining context.
+* ``MarkdownHeadingChunker`` — groups content per heading while keeping introductory prose.
+* ``JSONYamlChunker`` — slices structured configs by their first-level keys/items and falls back if parsing fails.
+* ``PlainTextChunker`` — groups blank-line separated paragraphs before falling back to sliding windows.
+* ``SlidingWindowChunker`` — deterministic line windows with configurable overlap.
 
 Roadmap
 -------

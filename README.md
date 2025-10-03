@@ -11,6 +11,7 @@ metadata-rich chunks.
 - Registry-driven architecture so language-specific chunkers can be added without touching callers.
 - Rich metadata (`chunk_id`, `line_start`, `line_end`, character spans) ready for downstream RAG and citation tooling.
 - Batteries-included tooling: Hatchling builds, Ruff linting, pytest coverage, Sphinx docs, and automated releases to PyPI + Read the Docs.
+- Language-aware chunkers for Python, Markdown, YAML/JSON config, and plain text with automatic fallback to sliding windows.
 
 ## Quick Start
 
@@ -31,6 +32,14 @@ for chunk in chunks[:2]:
 See the [design notes](docs/design/SEMANTIC_CHUNKER.md) for the roadmap toward language-aware and embedding-driven chunkers.
 
 Documentation lives on Read the Docs: <https://chunky.readthedocs.io>
+
+## Built-in Chunkers
+
+* `PythonSemanticChunker` — splits modules on top-level functions/classes and groups leftover module context.
+* `MarkdownHeadingChunker` — emits chunks per heading while keeping the optional intro section.
+* `JSONYamlChunker` — slices configs by top-level keys/items and falls back gracefully when parsing fails.
+* `PlainTextChunker` — groups blank-line-separated paragraphs; other files drop to the sliding-window fallback.
+* `SlidingWindowChunker` — deterministic line windows with overlap when no specialised handler is available.
 
 ## Installation
 

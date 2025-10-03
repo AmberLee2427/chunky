@@ -19,7 +19,7 @@ def _write_tmp(tmp_path: Path, name: str, content: str) -> Path:
 def test_sliding_window_chunks_by_lines(tmp_path: Path) -> None:
     pipeline = ChunkPipeline()
     content = "\n".join(f"line {i}" for i in range(1, 251))
-    path = _write_tmp(tmp_path, "sample.py", content)
+    path = _write_tmp(tmp_path, "sample.fallback", content)
 
     config = ChunkerConfig(lines_per_chunk=50, line_overlap=10)
     chunks = pipeline.chunk_file(path, config=config)
@@ -36,7 +36,7 @@ def test_sliding_window_chunks_by_lines(tmp_path: Path) -> None:
 def test_metadata_includes_character_offsets(tmp_path: Path) -> None:
     pipeline = ChunkPipeline()
     content = "first\nsecond\nthird\nfourth"
-    path = _write_tmp(tmp_path, "chars.txt", content)
+    path = _write_tmp(tmp_path, "chars.custom", content)
 
     config = ChunkerConfig(lines_per_chunk=2, line_overlap=0)
     chunks = pipeline.chunk_file(path, config=config)
@@ -52,7 +52,7 @@ def test_metadata_includes_character_offsets(tmp_path: Path) -> None:
 def test_max_chunks_limit(tmp_path: Path) -> None:
     pipeline = ChunkPipeline()
     content = "\n".join(f"row {i}" for i in range(40))
-    path = _write_tmp(tmp_path, "limited.md", content)
+    path = _write_tmp(tmp_path, "limited.custom", content)
 
     config = ChunkerConfig(lines_per_chunk=10, line_overlap=0, max_chunks=2)
     chunks = pipeline.chunk_file(path, config=config)
@@ -62,10 +62,9 @@ def test_max_chunks_limit(tmp_path: Path) -> None:
     assert chunks[-1].metadata["line_end"] == 20
 
 
-@pytest.mark.parametrize("extension", [".py", ".md", ".unknown"])
-def test_fallback_handles_unknown_extensions(tmp_path: Path, extension: str) -> None:
+def test_fallback_handles_unknown_extension(tmp_path: Path) -> None:
     pipeline = ChunkPipeline()
-    path = _write_tmp(tmp_path, f"file{extension}", "one\ntwo\nthree")
+    path = _write_tmp(tmp_path, "file.unknown", "one\ntwo\nthree")
 
     chunks = pipeline.chunk_file(path)
 
@@ -87,7 +86,7 @@ def test_empty_file_produces_empty_chunk(tmp_path: Path) -> None:
 
 def test_overlap_greater_than_window_is_clamped(tmp_path: Path) -> None:
     pipeline = ChunkPipeline()
-    path = _write_tmp(tmp_path, "clamp.py", "\n".join("x" for _ in range(30)))
+    path = _write_tmp(tmp_path, "clamp.custom", "\n".join("x" for _ in range(30)))
 
     config = ChunkerConfig(lines_per_chunk=10, line_overlap=25)
     chunks = pipeline.chunk_file(path, config=config)
