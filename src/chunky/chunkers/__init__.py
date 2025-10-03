@@ -1,11 +1,11 @@
 """Built-in chunker implementations."""
 
+from ..registry import DEFAULT_REGISTRY
 from .fallback import SlidingWindowChunker
 from .markdown import MarkdownHeadingChunker
 from .python import PythonSemanticChunker
 from .text import PlainTextChunker
 from .yaml_json import JSONYamlChunker
-from ..registry import DEFAULT_REGISTRY
 
 _DEFAULT_FALLBACK = SlidingWindowChunker()
 _PYTHON_CHUNKER = PythonSemanticChunker(_DEFAULT_FALLBACK)

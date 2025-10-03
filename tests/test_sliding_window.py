@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from chunky.pipeline import ChunkPipeline
 from chunky.types import ChunkerConfig
 

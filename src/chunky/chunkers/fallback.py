@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from ..core import Chunker
-from ..types import ChunkerConfig, Document
+from ..types import Chunk, ChunkerConfig, Document
 from ._common import compute_line_boundaries, make_chunk
 
 

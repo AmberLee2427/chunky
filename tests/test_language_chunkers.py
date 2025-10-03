@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import textwrap
+from pathlib import Path
 
-from chunky import ChunkPipeline, ChunkerConfig
+from chunky import ChunkerConfig, ChunkPipeline
 
 
 def _write(path: Path, content: str) -> Path:
