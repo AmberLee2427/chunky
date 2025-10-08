@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - TBD
+
 ### Added
 - Stable chunk identifiers (`<doc_id>#chunk-0000`) with configurable metadata keys/templates and per-chunk `chunk_count`/`source_document` fields.
 
