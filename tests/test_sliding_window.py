@@ -29,6 +29,9 @@ def test_sliding_window_chunks_by_lines(tmp_path: Path) -> None:
     assert chunks[-1].metadata["line_end"] == 250
     # Next chunk should overlap by 10 lines (start at 41)
     assert chunks[1].metadata["line_start"] == 41
+    total = len(chunks)
+    assert all(chunk.metadata["chunk_count"] == total for chunk in chunks)
+    assert all("sample.fallback" in chunk.metadata["source_document"] for chunk in chunks)
 
 
 def test_metadata_includes_character_offsets(tmp_path: Path) -> None:
@@ -45,6 +48,7 @@ def test_metadata_includes_character_offsets(tmp_path: Path) -> None:
     assert first["span_start"] == 0
     assert content[first["span_start"] : first["span_end"]] == chunks[0].text
     assert content[second["span_start"] : second["span_end"]] == chunks[1].text
+    assert chunks[0].metadata["chunk_count"] == 2
 
 
 def test_max_chunks_limit(tmp_path: Path) -> None:

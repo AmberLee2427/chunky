@@ -43,6 +43,12 @@ Documentation lives on Read the Docs: <https://chunky.readthedocs.io>
 * Tree-sitter chunkers (optional extra) for C/C++, HTML, Bash, and other structural languages.
 * `SlidingWindowChunker` — deterministic line windows with overlap when no specialised handler is available.
 
+### Chunk Identifiers
+
+Each chunk defaults to an ID of the form `<doc_id>#chunk-0000`. Supply a logical document identifier via
+`Document.metadata["doc_id"]` (or override the key with `ChunkerConfig.doc_id_key`) and customise the
+suffix using `ChunkerConfig.chunk_id_template` (both `{doc_id}` and `{index}` are available).
+
 ## Installation
 
 Install from PyPI:

@@ -57,6 +57,10 @@ Built-in chunkers
 * Tree-sitter chunkers (optional extra) for C/C++/HTML/Bash when the `tree` extra is installed.
 * ``SlidingWindowChunker`` — deterministic line windows with configurable overlap.
 
+Chunk identifiers default to ``<doc_id>#chunk-0000``. Provide ``Document.metadata['doc_id']`` (or set
+``ChunkerConfig.doc_id_key``) and adjust the suffix with ``ChunkerConfig.chunk_id_template`` to suit your
+downstream needs.
+
 Roadmap
 -------
 

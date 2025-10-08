@@ -7,7 +7,7 @@ from typing import List, Optional, Tuple
 
 from ..core import Chunker
 from ..types import Chunk, ChunkerConfig, Document
-from ._common import compute_line_boundaries, make_chunk
+from ._common import compute_line_boundaries, finalize_chunks, make_chunk, resolve_doc_id
 from .fallback import SlidingWindowChunker
 
 _HEADING_RE = re.compile(r"^(#{1,6})\s+.+")
@@ -30,6 +30,7 @@ class MarkdownHeadingChunker(Chunker):
 
         merged = self._merge_small_sections(sections, min_lines=1)
         line_starts, line_ends = compute_line_boundaries(lines)
+        doc_id = resolve_doc_id(document, config)
 
         chunks: List[Chunk] = []
         for start, end in merged:
@@ -45,11 +46,17 @@ class MarkdownHeadingChunker(Chunker):
                     config=config,
                     line_starts=line_starts,
                     line_ends=line_ends,
+                    doc_id=doc_id,
+                    chunk_id_template=config.chunk_id_template,
                     extra_metadata={"chunk_type": "markdown"},
                 )
             )
 
-        return chunks or self._fallback.chunk(document, config)
+        if not chunks:
+            return self._fallback.chunk(document, config)
+
+        finalize_chunks(chunks, doc_id)
+        return chunks
 
     @staticmethod
     def _find_sections(lines: List[str]) -> List[Tuple[int, int]]:

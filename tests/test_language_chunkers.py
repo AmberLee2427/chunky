@@ -8,6 +8,9 @@ from pathlib import Path
 import pytest
 
 from chunky import ChunkerConfig, ChunkPipeline
+from chunky.chunkers.fallback import SlidingWindowChunker
+from chunky.chunkers.python import PythonSemanticChunker
+from chunky.types import Document
 
 try:  # optional Tree-sitter support
     from tree_sitter_languages import get_language  # type: ignore
@@ -239,5 +242,42 @@ def test_bash_tree_sitter_chunker(tmp_path: Path) -> None:
     if not chunks or chunks[0].metadata.get("chunk_type") != "bash":
         pytest.skip("Tree-sitter Bash grammar unavailable on this platform")
 
+    if not chunks or chunks[0].metadata.get("chunk_type") != "bash":
+        pytest.skip("Tree-sitter Bash grammar unavailable on this platform")
+
     assert len(chunks) == 2
     assert all(chunk.metadata.get("chunk_type") == "bash" for chunk in chunks)
+
+
+def test_chunk_ids_use_doc_metadata() -> None:
+    chunker = PythonSemanticChunker()
+    doc = Document(
+        path=Path("demo.py"),
+        content="def hi():\n    return 1\n",
+        metadata={"doc_id": "repo/demo.py"},
+    )
+    chunks = chunker.chunk(doc, ChunkerConfig())
+    assert chunks
+    assert chunks[0].chunk_id == "repo/demo.py#chunk-0000"
+    assert chunks[0].metadata["chunk_count"] == len(chunks)
+    assert chunks[0].metadata["source_document"] == "repo/demo.py"
+
+
+def test_chunk_id_template_customisation(tmp_path: Path) -> None:
+    chunker = SlidingWindowChunker()
+    doc = Document(
+        path=tmp_path / "demo.txt",
+        content="one\ntwo\n",
+        metadata={"slug": "docs/demo"},
+    )
+    config = ChunkerConfig(
+        lines_per_chunk=1,
+        line_overlap=0,
+        doc_id_key="slug",
+        chunk_id_template="{doc_id}@{index:02d}",
+    )
+    chunks = chunker.chunk(doc, config)
+    assert chunks
+    assert chunks[0].chunk_id == "docs/demo@00"
+    assert chunks[0].metadata["chunk_count"] == len(chunks)
+    assert chunks[0].metadata["source_document"] == "docs/demo"

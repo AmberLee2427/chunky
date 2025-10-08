@@ -23,7 +23,7 @@ class Chunk:
 
     chunk_id: str
     text: str
-    source_document: Path
+    source_document: str
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -36,6 +36,8 @@ class ChunkerConfig:
     line_overlap: int = 20
     max_chunks: Optional[int] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
+    doc_id_key: str = "doc_id"
+    chunk_id_template: str = "{doc_id}#chunk-{index:04d}"
 
     def clamp_lines(self, lines: int) -> int:
         """Clamp the requested line count to a sensible positive value."""

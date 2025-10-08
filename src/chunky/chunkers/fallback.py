@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from ..core import Chunker
 from ..types import Chunk, ChunkerConfig, Document
-from ._common import compute_line_boundaries, make_chunk
+from ._common import compute_line_boundaries, finalize_chunks, make_chunk, resolve_doc_id
 
 
 class SlidingWindowChunker(Chunker):
@@ -14,6 +14,7 @@ class SlidingWindowChunker(Chunker):
         lines = document.content.splitlines()
         window = config.clamp_lines(config.lines_per_chunk)
         overlap = config.clamp_overlap(config.line_overlap, window)
+        doc_id = resolve_doc_id(document, config)
 
         if not lines:
             chunk = make_chunk(
@@ -25,8 +26,11 @@ class SlidingWindowChunker(Chunker):
                 config=config,
                 line_starts=[0],
                 line_ends=[0],
+                doc_id=doc_id,
+                chunk_id_template=config.chunk_id_template,
             )
             chunk.metadata.update({"line_start": 0, "line_end": 0})
+            finalize_chunks([chunk], doc_id)
             return [chunk]
 
         chunks: list[Chunk] = []
@@ -50,6 +54,8 @@ class SlidingWindowChunker(Chunker):
                     config=config,
                     line_starts=line_starts,
                     line_ends=line_ends,
+                    doc_id=doc_id,
+                    chunk_id_template=config.chunk_id_template,
                 )
             )
 
@@ -65,4 +71,5 @@ class SlidingWindowChunker(Chunker):
                 next_start = end_line
             start_line = next_start
 
+        finalize_chunks(chunks, doc_id)
         return chunks

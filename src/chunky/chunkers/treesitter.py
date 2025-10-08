@@ -7,7 +7,7 @@ from typing import Dict, Iterable, List, Optional
 
 from ..core import Chunker
 from ..types import Chunk, ChunkerConfig, Document
-from ._common import compute_line_boundaries, make_chunk
+from ._common import compute_line_boundaries, finalize_chunks, make_chunk, resolve_doc_id
 from .fallback import SlidingWindowChunker
 
 try:  # pragma: no cover - optional dependency guard
@@ -85,6 +85,7 @@ class TreeSitterChunker(Chunker):
 
         lines = source.splitlines()
         line_starts, line_ends = compute_line_boundaries(lines)
+        doc_id = resolve_doc_id(document, config)
 
         chunks: List[Chunk] = []
         for start_line, end_line in ranges:
@@ -99,11 +100,17 @@ class TreeSitterChunker(Chunker):
                 config=config,
                 line_starts=line_starts,
                 line_ends=line_ends,
+                doc_id=doc_id,
+                chunk_id_template=config.chunk_id_template,
                 extra_metadata=self.spec.metadata or {"chunk_type": self.spec.language},
             )
             chunks.append(chunk)
 
-        return chunks or self.fallback.chunk(document, config)
+        if not chunks:
+            return self.fallback.chunk(document, config)
+
+        finalize_chunks(chunks, doc_id)
+        return chunks
 
 
 def _select_ranges(captures: Iterable[tuple], capture_name: str) -> List[tuple[int, int]]:

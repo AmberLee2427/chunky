@@ -23,8 +23,22 @@ def compute_line_boundaries(lines: List[str]) -> tuple[List[int], List[int]]:
     return starts, ends
 
 
-def build_chunk_id(path: Path, index: int) -> str:
-    return f"{path}::chunk-{index}"
+def resolve_doc_id(document: Document, config: ChunkerConfig) -> str:
+    value = document.metadata.get(config.doc_id_key)
+    if value is None or value == "":
+        return document.path.as_posix()
+    return str(value)
+
+
+def build_chunk_id(doc_id: str, index: int, template: str, path: Path) -> str:
+    return template.format(doc_id=doc_id, index=index, path=path.as_posix())
+
+
+def finalize_chunks(chunks: List[Chunk], doc_id: str) -> None:
+    total = len(chunks)
+    for chunk in chunks:
+        chunk.metadata["chunk_count"] = total
+        chunk.metadata.setdefault("source_document", doc_id)
 
 
 def make_chunk(
@@ -37,6 +51,8 @@ def make_chunk(
     config: ChunkerConfig,
     line_starts: List[int],
     line_ends: List[int],
+    doc_id: str,
+    chunk_id_template: str,
     extra_metadata: Optional[Dict[str, object]] = None,
 ) -> Chunk:
     """Create a chunk from the given line span."""
@@ -51,6 +67,7 @@ def make_chunk(
         "line_end": end_line,
         "span_start": span_start,
         "span_end": span_end,
+        "source_document": doc_id,
     }
     if config.metadata:
         metadata.update(config.metadata)
@@ -58,8 +75,8 @@ def make_chunk(
         metadata.update(extra_metadata)
 
     return Chunk(
-        chunk_id=build_chunk_id(document.path, chunk_index),
+        chunk_id=build_chunk_id(doc_id, chunk_index, chunk_id_template, document.path),
         text=text,
-        source_document=document.path,
+        source_document=doc_id,
         metadata=metadata,
     )
