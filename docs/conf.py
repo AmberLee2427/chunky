@@ -17,9 +17,12 @@ project = "chunky"
 copyright = f"{datetime.now():%Y}, Nancy Brain Contributors"
 
 try:
-    release = importlib.metadata.version("chunky")
+    release = importlib.metadata.version("chunky-files")
 except importlib.metadata.PackageNotFoundError:
-    release = importlib.import_module("chunky.__about__").__version__
+    try:
+        release = importlib.metadata.version("chunky")
+    except importlib.metadata.PackageNotFoundError:
+        release = importlib.import_module("chunky.__about__").__version__
 
 extensions = [
     "sphinx.ext.autodoc",

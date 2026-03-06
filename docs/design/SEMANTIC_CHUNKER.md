@@ -1,5 +1,9 @@
 # Semantic Chunking Library Design
 
+> Archival note: This document is an early design draft retained for historical context.
+> It is not the current implementation contract. For implemented v2 behavior, see
+> `docs/design/CHUNKY_V2_SPEC.md`.
+
 ## 1. Background & Motivation
 
 Our existing `SmartChunker` performs a hybrid of sliding windows and heuristic boundary searches. When processing medium-sized code files the forward/backward scans can explode in CPU and memory, causing build failures. We also have no semantic awareness for other file types, leading to arbitrary splits. To make the knowledge-base pipeline reliable and extensible we want a modular chunking library that plugs cleanly into the Nancy Brain build as well as the new MCP-based RAG service powering the Slack bot. The same library will ship as a standalone package (working name `chunky`) so other indexing services can reuse it. We want that library to:

@@ -11,3 +11,11 @@ chunky.chunkers
    :recursive:
 
    fallback
+   fortran
+   markdown
+   notebook
+   python
+   rst
+   text
+   treesitter
+   yaml_json

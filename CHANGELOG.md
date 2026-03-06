@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.0.0] - TBD
+## [2.0.0] - 2026-03-06
 
 ### Breaking changes
 - `ChunkerConfig` defaults changed: `max_chars` 2000→1000, `lines_per_chunk` 120→40,

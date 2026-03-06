@@ -10,7 +10,7 @@ metadata-rich chunks.
 - Deterministic sliding-window fallback that keeps progress even on unknown file types.
 - Registry-driven architecture so language-specific chunkers can be added without touching callers.
 - Rich metadata (`chunk_id`, `line_start`, `line_end`, character spans) ready for downstream RAG and citation tooling.
-- Language-aware chunkers for Python, Markdown, YAML/JSON config, plain text, Fortran, and (via Tree-sitter) C/C++/HTML/Bash.
+- Language-aware chunkers for Python, Markdown, YAML/JSON config, plain text, Fortran, reStructuredText (`.rst`), notebook exports (`.nb.txt`), and (via Tree-sitter) C/C++/HTML/Bash.
 - Batteries-included tooling: Hatchling builds, Ruff linting, pytest coverage, Sphinx docs, and automated releases to PyPI + Read the Docs.
 
 ## Quick Start
@@ -21,7 +21,7 @@ from pathlib import Path
 from chunky import ChunkPipeline, ChunkerConfig
 
 pipeline = ChunkPipeline()
-config = ChunkerConfig(lines_per_chunk=80, line_overlap=10)
+config = ChunkerConfig(max_chars=1000, lines_per_chunk=40, line_overlap=5)
 
 chunks = pipeline.chunk_file(Path("path/to/file.py"), config=config)
 
@@ -29,7 +29,8 @@ for chunk in chunks[:2]:
     print(chunk.chunk_id, chunk.metadata["line_start"], chunk.metadata["line_end"])
 ```
 
-See the [design notes](docs/design/SEMANTIC_CHUNKER.md) for the roadmap toward language-aware and embedding-driven chunkers.
+See the [v2 implementation spec](docs/design/CHUNKY_V2_SPEC.md) for release behavior details.
+The original [semantic chunker design draft](docs/design/SEMANTIC_CHUNKER.md) is retained as archival context.
 
 Documentation lives on Read the Docs: <https://chunky.readthedocs.io>
 
@@ -40,6 +41,8 @@ Documentation lives on Read the Docs: <https://chunky.readthedocs.io>
 * `JSONYamlChunker` — slices configs by top-level keys/items and falls back gracefully when parsing fails.
 * `PlainTextChunker` — groups blank-line-separated paragraphs before falling back to sliding windows.
 * `FortranChunker` — captures subroutine/function/program blocks.
+* `RSTChunker` — detects reStructuredText section headings and chunks by section.
+* `NotebookChunker` — groups nb4llm notebook cells (`.nb.txt`) into markdown+code context chunks.
 * Tree-sitter chunkers (optional extra) for C/C++, HTML, Bash, and other structural languages.
 * `SlidingWindowChunker` — deterministic line windows with overlap when no specialised handler is available.
 

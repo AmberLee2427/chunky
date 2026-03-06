@@ -6,8 +6,8 @@ well-behaved text chunks. The pipeline is language-aware, pluggable, and ready f
 Nancy Brain's MCP-backed retrieval workflows.
 
 .. note::
-   The implementation is in active development. See ``SEMANTIC_CHUNKER.md`` for the full
-   design document and roadmap.
+   See ``design/CHUNKY_V2_SPEC.md`` for the implemented v2 behavior.
+   ``design/SEMANTIC_CHUNKER.md`` is retained as an archival early design draft.
 
 Getting Started
 ---------------
@@ -40,7 +40,7 @@ First chunks via the pipeline:
    from chunky import ChunkPipeline, ChunkerConfig
 
    pipeline = ChunkPipeline()
-   config = ChunkerConfig(lines_per_chunk=80, line_overlap=10)
+   config = ChunkerConfig(max_chars=1000, lines_per_chunk=40, line_overlap=5)
    chunks = pipeline.chunk_file(Path("/path/to/file.py"), config=config)
 
    for chunk in chunks:
@@ -54,6 +54,8 @@ Built-in chunkers
 * ``JSONYamlChunker`` — slices structured configs by their first-level keys/items and falls back if parsing fails.
 * ``PlainTextChunker`` — groups blank-line separated paragraphs before falling back to sliding windows.
 * ``FortranChunker`` — captures `program`, `subroutine`, and `function` blocks with minimal heuristics.
+* ``RSTChunker`` — detects reStructuredText heading sections and chunks by section boundaries.
+* ``NotebookChunker`` — groups nb4llm notebook exports (`.nb.txt`) into markdown+code context chunks.
 * Tree-sitter chunkers (optional extra) for C/C++/HTML/Bash when the `tree` extra is installed.
 * ``SlidingWindowChunker`` — deterministic line windows with configurable overlap.
 
@@ -65,6 +67,6 @@ Roadmap
 -------
 
 * Phase 1: infrastructure scaffolding and sliding-window baseline.
-* Phase 2: language-specific chunkers (Python, Markdown, JSON/YAML, notebooks).
+* Phase 2: language-specific chunkers (Python, Markdown, JSON/YAML, notebooks, RST).
 * Phase 3: semantic/embedding-driven chunking.
 * Phase 4: documentation, benchmarks, and Nancy Brain integration.
