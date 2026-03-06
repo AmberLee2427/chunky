@@ -1,3 +1,8 @@
+<p align="center">
+  <a href="https://chunky.readthedocs.io/"><img src="docs/_assets/chunky2.png" alt="logo" width=40%></a>
+</p>
+
+
 # Chunky
 
 Chunky is a python package for intelligently chunking scientific and technical repositories.
