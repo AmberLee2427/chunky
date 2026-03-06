@@ -31,9 +31,9 @@ class Chunk:
 class ChunkerConfig:
     """Configuration shared across chunkers."""
 
-    max_chars: int = 2000
-    lines_per_chunk: int = 120
-    line_overlap: int = 20
+    max_chars: int = 1000
+    lines_per_chunk: int = 40
+    line_overlap: int = 5
     max_chunks: Optional[int] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
     doc_id_key: str = "doc_id"

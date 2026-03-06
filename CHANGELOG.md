@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - TBD
+
+### Breaking changes
+- `ChunkerConfig` defaults changed: `max_chars` 2000→1000, `lines_per_chunk` 120→40,
+  `line_overlap` 20→5.
+- `ChunkerRegistry` compound-extension lookups now take priority over single-suffix
+  lookups for paths with two suffixes.
+
+### Added
+- `RSTChunker`: section-aware chunker for reStructuredText files, registered for `.rst`.
+- `NotebookChunker`: cell-aware chunker for nb4llm `.nb.txt` files, registered for
+  `.nb.txt` via compound extension support.
+- `ChunkerRegistry` compound extension support (e.g. `"nb.txt"`).
+- `_secondary_split` helper in `_common.py` enforces `max_chars` via blank-line,
+  sentence, then sliding-window fallback.
+
+### Fixed
+- `max_chars` was defined in `ChunkerConfig` but never enforced; all chunkers now
+  respect it.
+- `MarkdownHeadingChunker` and `PythonSemanticChunker` no longer emit chunks that
+  exceed `max_chars`.
+- `SlidingWindowChunker` reduces effective window when `max_chars` would be exceeded
+  at the default `lines_per_chunk`.
+
 ## [1.0.0] - 2025-10-07
 
 ### Added

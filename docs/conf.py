@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib
 import importlib.metadata
 import os
 import sys
@@ -18,7 +19,7 @@ copyright = f"{datetime.now():%Y}, Nancy Brain Contributors"
 try:
     release = importlib.metadata.version("chunky")
 except importlib.metadata.PackageNotFoundError:
-    from chunky.__about__ import __version__ as release  # type: ignore[assignment]
+    release = importlib.import_module("chunky.__about__").__version__
 
 extensions = [
     "sphinx.ext.autodoc",

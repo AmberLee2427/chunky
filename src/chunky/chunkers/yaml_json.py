@@ -8,7 +8,13 @@ from typing import List, Optional, Sequence, Tuple
 
 from ..core import Chunker
 from ..types import Chunk, ChunkerConfig, Document
-from ._common import compute_line_boundaries, finalize_chunks, make_chunk, resolve_doc_id
+from ._common import (
+    compute_line_boundaries,
+    enforce_max_chars,
+    finalize_chunks,
+    make_chunk,
+    resolve_doc_id,
+)
 from .fallback import SlidingWindowChunker
 
 
@@ -38,28 +44,32 @@ class JSONYamlChunker(Chunker):
 
         chunks: List[Chunk] = []
         for start_char, end_char, label in regions:
-            if config.max_chunks and len(chunks) >= config.max_chunks:
-                break
             start_line = self._char_to_line(start_char, line_starts)
             end_line = self._char_to_line(max(end_char - 1, start_char), line_starts) + 1
             end_line = min(end_line, len(lines))
             if start_line >= end_line:
                 continue
-            chunks.append(
-                make_chunk(
-                    document=document,
-                    lines=lines,
-                    start_line=start_line,
-                    end_line=end_line,
-                    chunk_index=len(chunks),
-                    config=config,
-                    line_starts=line_starts,
-                    line_ends=line_ends,
-                    doc_id=doc_id,
-                    chunk_id_template=config.chunk_id_template,
-                    extra_metadata={"chunk_type": label},
+            segments = enforce_max_chars(lines, [(start_line, end_line)], config)
+            for segment_start, segment_end in segments:
+                if config.max_chunks and len(chunks) >= config.max_chunks:
+                    break
+                chunks.append(
+                    make_chunk(
+                        document=document,
+                        lines=lines,
+                        start_line=segment_start,
+                        end_line=segment_end,
+                        chunk_index=len(chunks),
+                        config=config,
+                        line_starts=line_starts,
+                        line_ends=line_ends,
+                        doc_id=doc_id,
+                        chunk_id_template=config.chunk_id_template,
+                        extra_metadata={"chunk_type": label},
+                    )
                 )
-            )
+            if config.max_chunks and len(chunks) >= config.max_chunks:
+                break
 
         if not chunks:
             return self._fallback.chunk(document, config)

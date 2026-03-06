@@ -4,7 +4,9 @@ from ..registry import DEFAULT_REGISTRY
 from .fallback import SlidingWindowChunker
 from .fortran import FortranChunker
 from .markdown import MarkdownHeadingChunker
+from .notebook import NotebookChunker
 from .python import PythonSemanticChunker
+from .rst import RSTChunker
 from .text import PlainTextChunker
 from .yaml_json import JSONYamlChunker
 
@@ -20,6 +22,8 @@ _MARKDOWN_CHUNKER = MarkdownHeadingChunker(_DEFAULT_FALLBACK)
 _STRUCTURED_CHUNKER = JSONYamlChunker(_DEFAULT_FALLBACK)
 _TEXT_CHUNKER = PlainTextChunker(_DEFAULT_FALLBACK)
 _FORTRAN_CHUNKER = FortranChunker(_DEFAULT_FALLBACK)
+_RST_CHUNKER = RSTChunker(_DEFAULT_FALLBACK)
+_NOTEBOOK_CHUNKER = NotebookChunker(_MARKDOWN_CHUNKER)
 
 DEFAULT_REGISTRY.register(["py", "pyi", "pyx"], _PYTHON_CHUNKER)
 DEFAULT_REGISTRY.register(["md", "markdown", "mdx"], _MARKDOWN_CHUNKER)
@@ -27,6 +31,8 @@ DEFAULT_REGISTRY.register(["json"], _STRUCTURED_CHUNKER)
 DEFAULT_REGISTRY.register(["yaml", "yml"], _STRUCTURED_CHUNKER)
 DEFAULT_REGISTRY.register(["txt", "text", "log"], _TEXT_CHUNKER)
 DEFAULT_REGISTRY.register(["f", "f90", "f95", "f03", "for"], _FORTRAN_CHUNKER)
+DEFAULT_REGISTRY.register(["rst"], _RST_CHUNKER)
+DEFAULT_REGISTRY.register(["nb.txt"], _NOTEBOOK_CHUNKER)
 
 if TreeSitterChunker and TreeSitterSpec:
     ts_specs = [
@@ -85,4 +91,6 @@ __all__ = [
     "PlainTextChunker",
     "JSONYamlChunker",
     "FortranChunker",
+    "RSTChunker",
+    "NotebookChunker",
 ]

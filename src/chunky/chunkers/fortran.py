@@ -7,7 +7,13 @@ from typing import List, Optional
 
 from ..core import Chunker
 from ..types import Chunk, ChunkerConfig, Document
-from ._common import compute_line_boundaries, finalize_chunks, make_chunk, resolve_doc_id
+from ._common import (
+    compute_line_boundaries,
+    enforce_max_chars,
+    finalize_chunks,
+    make_chunk,
+    resolve_doc_id,
+)
 from .fallback import SlidingWindowChunker
 
 _FORTRAN_START_RE = re.compile(r"^\s*(subroutine|function|program)\b", re.IGNORECASE)
@@ -42,6 +48,7 @@ class FortranChunker(Chunker):
 
         if not boundaries:
             return self.fallback.chunk(document, config)
+        boundaries = enforce_max_chars(lines, boundaries, config)
 
         line_starts, line_ends = compute_line_boundaries(lines)
         doc_id = resolve_doc_id(document, config)

@@ -7,7 +7,13 @@ from typing import List, Optional, Tuple
 
 from ..core import Chunker
 from ..types import Chunk, ChunkerConfig, Document
-from ._common import compute_line_boundaries, finalize_chunks, make_chunk, resolve_doc_id
+from ._common import (
+    compute_line_boundaries,
+    enforce_max_chars,
+    finalize_chunks,
+    make_chunk,
+    resolve_doc_id,
+)
 from .fallback import SlidingWindowChunker
 
 _HEADING_RE = re.compile(r"^(#{1,6})\s+.+")
@@ -29,6 +35,7 @@ class MarkdownHeadingChunker(Chunker):
             return self._fallback.chunk(document, config)
 
         merged = self._merge_small_sections(sections, min_lines=1)
+        merged = enforce_max_chars(lines, merged, config)
         line_starts, line_ends = compute_line_boundaries(lines)
         doc_id = resolve_doc_id(document, config)
 

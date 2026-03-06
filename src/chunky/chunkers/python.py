@@ -7,7 +7,13 @@ from typing import List, Optional
 
 from ..core import Chunker
 from ..types import Chunk, ChunkerConfig, Document
-from ._common import compute_line_boundaries, finalize_chunks, make_chunk, resolve_doc_id
+from ._common import (
+    compute_line_boundaries,
+    enforce_max_chars,
+    finalize_chunks,
+    make_chunk,
+    resolve_doc_id,
+)
 from .fallback import SlidingWindowChunker
 
 
@@ -56,6 +62,7 @@ class PythonSemanticChunker(Chunker):
         segments = [seg for seg in segments if seg[0] < seg[1]]
         if not segments:
             return self._fallback.chunk(document, config)
+        segments = enforce_max_chars(lines, segments, config)
 
         chunks = []
         for start, end in segments:

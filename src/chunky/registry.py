@@ -41,8 +41,16 @@ class ChunkerRegistry:
     def get(self, path: Path) -> Chunker:
         """Return the chunker associated with the file path or the fallback."""
 
-        suffix = self._normalize(path.suffix or "")
-        chunker = self._registry.get(suffix)
+        suffixes = [self._normalize(suffix) for suffix in path.suffixes if suffix]
+
+        chunker = None
+        suffix = ""
+        if len(suffixes) >= 2:
+            suffix = f"{suffixes[-2]}.{suffixes[-1]}"
+            chunker = self._registry.get(suffix)
+        if chunker is None and suffixes:
+            suffix = suffixes[-1]
+            chunker = self._registry.get(suffix)
         if chunker is not None:
             return chunker
         if self._fallback is None:

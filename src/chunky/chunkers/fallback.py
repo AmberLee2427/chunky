@@ -4,7 +4,14 @@ from __future__ import annotations
 
 from ..core import Chunker
 from ..types import Chunk, ChunkerConfig, Document
-from ._common import compute_line_boundaries, finalize_chunks, make_chunk, resolve_doc_id
+from ._common import (
+    compute_line_boundaries,
+    compute_line_length_prefix,
+    finalize_chunks,
+    make_chunk,
+    resolve_doc_id,
+    span_char_length,
+)
 
 
 class SlidingWindowChunker(Chunker):
@@ -12,8 +19,7 @@ class SlidingWindowChunker(Chunker):
 
     def chunk(self, document: Document, config: ChunkerConfig) -> list[Chunk]:
         lines = document.content.splitlines()
-        window = config.clamp_lines(config.lines_per_chunk)
-        overlap = config.clamp_overlap(config.line_overlap, window)
+        requested_window = config.clamp_lines(config.lines_per_chunk)
         doc_id = resolve_doc_id(document, config)
 
         if not lines:
@@ -37,6 +43,17 @@ class SlidingWindowChunker(Chunker):
         line_count = len(lines)
         # Pre-compute character offsets once to avoid quadratic scans.
         line_starts, line_ends = compute_line_boundaries(lines)
+        length_prefix = compute_line_length_prefix(lines)
+
+        sample = lines[:20]
+        if sample:
+            avg_line_len = max(1, sum(len(line) for line in sample) // len(sample))
+        else:  # pragma: no cover - guarded by empty-lines branch above
+            avg_line_len = 1
+        max_chars = max(1, config.max_chars)
+        char_window = max(1, max_chars // avg_line_len)
+        window = max(1, min(requested_window, char_window))
+        overlap = config.clamp_overlap(config.line_overlap, window)
 
         start_line = 0
         chunk_index = 0
@@ -44,6 +61,13 @@ class SlidingWindowChunker(Chunker):
         while start_line < line_count:
             previous_start = start_line
             end_line = min(start_line + window, line_count)
+
+            while (
+                end_line - start_line > 1
+                and span_char_length(length_prefix, start_line, end_line) > max_chars
+            ):
+                end_line -= 1
+
             chunks.append(
                 make_chunk(
                     document=document,
