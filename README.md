@@ -5,6 +5,23 @@ It provides a modular pipeline that powers the Nancy Brain knowledge base and MC
 while remaining useful as a standalone library for retrieval systems that need deterministic,
 metadata-rich chunks.
 
+## Citation
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18891711.svg)](https://doi.org/10.5281/zenodo.18891711)
+
+```bibtex
+@software{chunky,
+  author       = {Amber Malpas},
+  title        = {AmberLee2427/chunky: v2.0.0},
+  month        = mar,
+  year         = 2026,
+  publisher    = {Zenodo},
+  version      = {v2.0.0},
+  doi          = {10.5281/zenodo.18891712},
+  url          = {https://doi.org/10.5281/zenodo.18891712},
+}
+```
+
 ## Highlights
 
 - Deterministic sliding-window fallback that keeps progress even on unknown file types.
