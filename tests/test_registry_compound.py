@@ -4,10 +4,18 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from chunky.chunkers import DEFAULT_REGISTRY
 from chunky.chunkers.fallback import SlidingWindowChunker
 from chunky.chunkers.notebook import NotebookChunker
 from chunky.chunkers.text import PlainTextChunker
 from chunky.registry import ChunkerRegistry
+
+
+def test_default_registry_handles_unknown_extension_without_pipeline() -> None:
+    """DEFAULT_REGISTRY must have a fallback so callers don't need ChunkPipeline."""
+    chunker = DEFAULT_REGISTRY.get(Path("mystery.unknownext"))
+    assert isinstance(chunker, SlidingWindowChunker)
+
 
 
 def test_registry_prefers_compound_extension_lookup() -> None:

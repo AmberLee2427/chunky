@@ -45,3 +45,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# Cloned repos for notebook investigations
+docs/design/test_data/

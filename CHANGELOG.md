@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-03-06
+
+### Fixed
+- `DEFAULT_REGISTRY` had no fallback chunker set at import time. Calling
+  `DEFAULT_REGISTRY.get(path)` for an unregistered extension raised `KeyError`
+  unless a `ChunkPipeline` had been instantiated first. `SlidingWindowChunker`
+  is now set as the fallback in `chunkers/__init__.py` alongside the other
+  `register()` calls.
+
 ## [2.0.0] - 2026-03-06
 
 ### Breaking changes
