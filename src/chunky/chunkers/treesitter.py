@@ -7,7 +7,7 @@ from typing import Dict, Iterable, List, Optional
 
 from ..core import Chunker
 from ..types import Chunk, ChunkerConfig, Document
-from ._common import compute_line_boundaries, finalize_chunks, make_chunk, resolve_doc_id
+from ._common import compute_line_boundaries, enforce_max_chars, finalize_chunks, make_chunk, resolve_doc_id
 from .fallback import SlidingWindowChunker
 
 try:  # pragma: no cover - optional dependency guard
@@ -86,6 +86,8 @@ class TreeSitterChunker(Chunker):
         lines = source.splitlines()
         line_starts, line_ends = compute_line_boundaries(lines)
         doc_id = resolve_doc_id(document, config)
+
+        ranges = enforce_max_chars(lines, ranges, config)
 
         chunks: List[Chunk] = []
         for start_line, end_line in ranges:
