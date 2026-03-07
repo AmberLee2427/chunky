@@ -152,5 +152,5 @@ hasn't shipped yet). Add a `### Fixed` entry to the `[Unreleased]` CHANGELOG blo
 - Gap chunks currently reuse the language `chunk_type` (for example `"cpp"`) rather
   than introducing `*_context` values. This keeps existing downstream filters and
   tests stable while still fixing the coverage bug.
-- For this delivery, versioning follows the explicit request to perform a **minor**
-  bump (`2.1.0` → `2.2.0`) even though this document originally suggested a patch bump.
+- Versioning was corrected to a **patch** bump (`2.1.0` → `2.1.1`) to match the
+  scope of this bug fix.
