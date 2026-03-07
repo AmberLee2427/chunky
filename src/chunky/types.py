@@ -32,6 +32,7 @@ class ChunkerConfig:
     """Configuration shared across chunkers."""
 
     max_chars: int = 1000
+    min_chunk_chars: int = 0
     lines_per_chunk: int = 40
     line_overlap: int = 5
     max_chunks: Optional[int] = None

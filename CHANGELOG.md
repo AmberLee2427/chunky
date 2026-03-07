@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-03-07
+
+### Added
+- `ChunkerConfig.min_chunk_chars` field (default `0` = disabled). When set to a
+  positive integer, chunks with fewer stripped characters are forward-merged into
+  their successor rather than dropped.
+- `merge_small_chunks(chunks, min_chars)` public utility function in
+  `chunky.merge`, also exported from the top-level `chunky` package.
+- `ChunkPipeline.chunk_file` and `ChunkPipeline.chunk_documents` now apply
+  forward-merge automatically when `config.min_chunk_chars > 0`.
+
 ## [2.0.1] - 2026-03-06
 
 ### Fixed

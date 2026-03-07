@@ -7,6 +7,7 @@ from typing import Optional
 
 from .chunkers import SlidingWindowChunker
 from .loaders import DEFAULT_LOADER, DocumentLoader
+from .merge import merge_small_chunks
 from .registry import DEFAULT_REGISTRY, ChunkerRegistry
 from .types import Chunk, ChunkerConfig, Document
 
@@ -35,7 +36,8 @@ class ChunkPipeline:
         config = config or ChunkerConfig()
         document = self.loader.load(Path(path))
         chunker = self.registry.get(document.path)
-        return chunker.chunk(document, config)
+        chunks = chunker.chunk(document, config)
+        return merge_small_chunks(chunks, config.min_chunk_chars)
 
     def chunk_documents(
         self,
@@ -49,7 +51,8 @@ class ChunkPipeline:
         chunks: list[Chunk] = []
         for document in documents:
             chunker = self.registry.get(document.path)
-            chunks.extend(chunker.chunk(document, config))
+            doc_chunks = chunker.chunk(document, config)
+            chunks.extend(merge_small_chunks(doc_chunks, config.min_chunk_chars))
         return chunks
 
     def _ensure_fallback(self) -> None:
