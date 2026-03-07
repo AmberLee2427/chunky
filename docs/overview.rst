@@ -6,7 +6,8 @@ well-behaved text chunks. The pipeline is language-aware, pluggable, and ready f
 Nancy Brain's MCP-backed retrieval workflows.
 
 .. note::
-   See ``design/CHUNKY_V2_SPEC.md`` for the implemented v2 behavior.
+   See ``design/CHUNKY_V2_SPEC.md`` and ``design/CHUNK_MERGE_SPEC.md`` for
+   implemented v2/v2.1 behavior.
    ``design/SEMANTIC_CHUNKER.md`` is retained as an archival early design draft.
 
 Getting Started
@@ -40,7 +41,12 @@ First chunks via the pipeline:
    from chunky import ChunkPipeline, ChunkerConfig
 
    pipeline = ChunkPipeline()
-   config = ChunkerConfig(max_chars=1000, lines_per_chunk=40, line_overlap=5)
+   config = ChunkerConfig(
+       max_chars=1000,
+       min_chunk_chars=80,  # forward-merge tiny chunks into successor chunks
+       lines_per_chunk=40,
+       line_overlap=5,
+   )
    chunks = pipeline.chunk_file(Path("/path/to/file.py"), config=config)
 
    for chunk in chunks:
@@ -62,6 +68,14 @@ Built-in chunkers
 Chunk identifiers default to ``<doc_id>#chunk-0000``. Provide ``Document.metadata['doc_id']`` (or set
 ``ChunkerConfig.doc_id_key``) and adjust the suffix with ``ChunkerConfig.chunk_id_template`` to suit your
 downstream needs.
+
+Forward-merge behavior
+----------------------
+
+Set ``ChunkerConfig.min_chunk_chars`` to a positive integer to merge tiny chunks into
+their successor chunk (or into the predecessor for trailing tiny chunks). This keeps
+small but meaningful context (imports, decorators, short comments/docstrings) attached
+to nearby semantic content.
 
 Roadmap
 -------

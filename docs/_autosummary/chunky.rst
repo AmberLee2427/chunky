@@ -13,6 +13,7 @@
    chunkers
    core
    loaders
+   merge
    pipeline
    registry
    types

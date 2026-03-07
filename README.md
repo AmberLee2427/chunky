@@ -32,6 +32,7 @@ metadata-rich chunks.
 - Deterministic sliding-window fallback that keeps progress even on unknown file types.
 - Registry-driven architecture so language-specific chunkers can be added without touching callers.
 - Rich metadata (`chunk_id`, `line_start`, `line_end`, character spans) ready for downstream RAG and citation tooling.
+- Optional forward-merge for tiny chunks via `ChunkerConfig(min_chunk_chars=...)`, preserving content that would otherwise be dropped by downstream filters.
 - Language-aware chunkers for Python, Markdown, YAML/JSON config, plain text, Fortran, reStructuredText (`.rst`), notebook exports (`.nb.txt`), and (via Tree-sitter) C/C++/HTML/Bash.
 - Batteries-included tooling: Hatchling builds, Ruff linting, pytest coverage, Sphinx docs, and automated releases to PyPI + Read the Docs.
 
@@ -43,7 +44,12 @@ from pathlib import Path
 from chunky import ChunkPipeline, ChunkerConfig
 
 pipeline = ChunkPipeline()
-config = ChunkerConfig(max_chars=1000, lines_per_chunk=40, line_overlap=5)
+config = ChunkerConfig(
+    max_chars=1000,
+    min_chunk_chars=80,  # forward-merge tiny chunks into their successor
+    lines_per_chunk=40,
+    line_overlap=5,
+)
 
 chunks = pipeline.chunk_file(Path("path/to/file.py"), config=config)
 
@@ -51,7 +57,8 @@ for chunk in chunks[:2]:
     print(chunk.chunk_id, chunk.metadata["line_start"], chunk.metadata["line_end"])
 ```
 
-See the [v2 implementation spec](docs/design/CHUNKY_V2_SPEC.md) for release behavior details.
+See the [v2 implementation spec](docs/design/CHUNKY_V2_SPEC.md) and
+[v2.1 forward-merge spec](docs/design/CHUNK_MERGE_SPEC.md) for release behavior details.
 The original [semantic chunker design draft](docs/design/SEMANTIC_CHUNKER.md) is retained as archival context.
 
 Documentation lives on Read the Docs: <https://chunky.readthedocs.io>
@@ -73,6 +80,17 @@ Documentation lives on Read the Docs: <https://chunky.readthedocs.io>
 Each chunk defaults to an ID of the form `<doc_id>#chunk-0000`. Supply a logical document identifier via
 `Document.metadata["doc_id"]` (or override the key with `ChunkerConfig.doc_id_key`) and customise the
 suffix using `ChunkerConfig.chunk_id_template` (both `{doc_id}` and `{index}` are available).
+
+### Forward-Merge for Tiny Chunks
+
+Use `ChunkerConfig.min_chunk_chars` to preserve small leading/trailing context by merging tiny chunks
+into their successor (or predecessor at end-of-file) instead of dropping them in downstream pipelines.
+
+You can also apply this utility directly:
+
+```python
+from chunky import merge_small_chunks
+```
 
 ## Installation
 
