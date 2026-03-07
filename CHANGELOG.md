@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-03-07
+
+### Fixed
+- `TreeSitterChunker` now emits uncovered line ranges between captured AST nodes,
+  so C/C++/HTML/Bash chunking preserves full file coverage instead of silently
+  dropping non-matching content.
+- Tree-sitter language tests now validate coverage and context retention for
+  includes, structs, inter-function globals, and files with no function definitions.
+
 ## [2.1.0] - 2026-03-07
 
 ### Added

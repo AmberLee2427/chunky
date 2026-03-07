@@ -72,7 +72,7 @@ Documentation lives on Read the Docs: <https://chunky.readthedocs.io>
 * `FortranChunker` — captures subroutine/function/program blocks.
 * `RSTChunker` — detects reStructuredText section headings and chunks by section.
 * `NotebookChunker` — groups nb4llm notebook cells (`.nb.txt`) into markdown+code context chunks.
-* Tree-sitter chunkers (optional extra) for C/C++, HTML, Bash, and other structural languages.
+* Tree-sitter chunkers (optional extra) for C/C++, HTML, Bash, and other structural languages, with gap-filling so uncaptured lines are still emitted.
 * `SlidingWindowChunker` — deterministic line windows with overlap when no specialised handler is available.
 
 ### Chunk Identifiers

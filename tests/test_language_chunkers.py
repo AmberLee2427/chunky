@@ -26,6 +26,27 @@ def _write(path: Path, content: str) -> Path:
     return path
 
 
+def _read_fixture(name: str) -> str:
+    return (Path(__file__).parent / "fixtures" / name).read_text(encoding="utf-8").strip()
+
+
+def _require_tree_sitter_kind(chunks: list, kind: str) -> None:
+    if not chunks or chunks[0].metadata.get("chunk_type") != kind:
+        pytest.skip(f"Tree-sitter {kind.upper()} grammar unavailable on this platform")
+
+
+def _assert_full_coverage(chunks: list, source: str) -> None:
+    expected_lines = source.splitlines()
+    cursor = 1
+    for chunk in chunks:
+        start = int(chunk.metadata["line_start"])
+        end = int(chunk.metadata["line_end"])
+        assert start == cursor
+        assert start <= end
+        cursor = end + 1
+    assert cursor == len(expected_lines) + 1
+
+
 def test_python_chunker_splits_top_level_defs(tmp_path: Path) -> None:
     source = textwrap.dedent(
         '''
@@ -167,11 +188,101 @@ def test_c_tree_sitter_chunker(tmp_path: Path) -> None:
     pipeline = ChunkPipeline()
     chunks = pipeline.chunk_file(path)
 
-    if not chunks or chunks[0].metadata.get("chunk_type") != "c":
-        pytest.skip("Tree-sitter C grammar unavailable on this platform")
+    _require_tree_sitter_kind(chunks, "c")
 
-    assert len(chunks) == 2
     assert all(chunk.metadata.get("chunk_type") == "c" for chunk in chunks)
+    assert any("int add" in chunk.text for chunk in chunks)
+    assert any("helper" in chunk.text for chunk in chunks)
+    _assert_full_coverage(chunks, content)
+
+
+@pytest.mark.skipif(not _TREE_SITTER_AVAILABLE, reason="tree-sitter not installed")
+def test_cpp_full_coverage(tmp_path: Path) -> None:
+    content = _read_fixture("sample.cpp")
+    path = _write(tmp_path / "sample.cpp", content)
+
+    pipeline = ChunkPipeline()
+    chunks = pipeline.chunk_file(path)
+
+    _require_tree_sitter_kind(chunks, "cpp")
+
+    _assert_full_coverage(chunks, content)
+
+
+@pytest.mark.skipif(not _TREE_SITTER_AVAILABLE, reason="tree-sitter not installed")
+def test_cpp_includes_captured(tmp_path: Path) -> None:
+    content = _read_fixture("sample.cpp")
+    path = _write(tmp_path / "sample.cpp", content)
+
+    pipeline = ChunkPipeline()
+    chunks = pipeline.chunk_file(path)
+
+    _require_tree_sitter_kind(chunks, "cpp")
+
+    assert any(line.startswith("#include") for chunk in chunks for line in chunk.text.splitlines())
+
+
+@pytest.mark.skipif(not _TREE_SITTER_AVAILABLE, reason="tree-sitter not installed")
+def test_cpp_struct_captured(tmp_path: Path) -> None:
+    content = _read_fixture("sample.cpp")
+    path = _write(tmp_path / "sample.cpp", content)
+
+    pipeline = ChunkPipeline()
+    chunks = pipeline.chunk_file(path)
+
+    _require_tree_sitter_kind(chunks, "cpp")
+
+    assert any("struct Point" in chunk.text for chunk in chunks)
+
+
+@pytest.mark.skipif(not _TREE_SITTER_AVAILABLE, reason="tree-sitter not installed")
+def test_gap_filling_no_functions(tmp_path: Path) -> None:
+    content = textwrap.dedent(
+        """
+        #include <vector>
+
+        static const int LIMIT = 7;
+        struct Config { int value; };
+
+        // no functions in this file
+        """
+    ).strip()
+    path = _write(tmp_path / "no_functions.cpp", content)
+
+    pipeline = ChunkPipeline()
+    chunks = pipeline.chunk_file(path)
+
+    _require_tree_sitter_kind(chunks, "cpp")
+
+    assert any("LIMIT" in chunk.text for chunk in chunks)
+    assert any("Config" in chunk.text for chunk in chunks)
+    _assert_full_coverage(chunks, content)
+
+
+@pytest.mark.skipif(not _TREE_SITTER_AVAILABLE, reason="tree-sitter not installed")
+def test_gap_between_functions(tmp_path: Path) -> None:
+    content = textwrap.dedent(
+        """
+        int a() {
+            return 1;
+        }
+
+        int global_counter = 42;
+
+        int b() {
+            return global_counter;
+        }
+        """
+    ).strip()
+    path = _write(tmp_path / "gaps.cpp", content)
+
+    pipeline = ChunkPipeline()
+    chunks = pipeline.chunk_file(path)
+
+    _require_tree_sitter_kind(chunks, "cpp")
+
+    assert any("global_counter" in chunk.text for chunk in chunks)
+    _assert_full_coverage(chunks, content)
 
 
 @pytest.mark.skipif(not _TREE_SITTER_AVAILABLE, reason="tree-sitter not installed")
@@ -191,8 +302,7 @@ def test_html_tree_sitter_chunker(tmp_path: Path) -> None:
     pipeline = ChunkPipeline()
     chunks = pipeline.chunk_file(path)
 
-    if not chunks or chunks[0].metadata.get("chunk_type") != "html":
-        pytest.skip("Tree-sitter HTML grammar unavailable on this platform")
+    _require_tree_sitter_kind(chunks, "html")
 
     assert len(chunks) >= 2
     assert all(chunk.metadata.get("chunk_type") == "html" for chunk in chunks)
@@ -239,14 +349,12 @@ def test_bash_tree_sitter_chunker(tmp_path: Path) -> None:
     pipeline = ChunkPipeline()
     chunks = pipeline.chunk_file(path)
 
-    if not chunks or chunks[0].metadata.get("chunk_type") != "bash":
-        pytest.skip("Tree-sitter Bash grammar unavailable on this platform")
+    _require_tree_sitter_kind(chunks, "bash")
 
-    if not chunks or chunks[0].metadata.get("chunk_type") != "bash":
-        pytest.skip("Tree-sitter Bash grammar unavailable on this platform")
-
-    assert len(chunks) == 2
     assert all(chunk.metadata.get("chunk_type") == "bash" for chunk in chunks)
+    assert any(chunk.text.startswith("#!/bin/bash") for chunk in chunks)
+    assert any("greet()" in chunk.text for chunk in chunks)
+    assert any("build()" in chunk.text for chunk in chunks)
 
 
 def test_chunk_ids_use_doc_metadata() -> None:

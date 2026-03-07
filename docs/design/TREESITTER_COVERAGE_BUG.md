@@ -146,3 +146,11 @@ All five tests should pass with covered content; `#include`, `PI`, `Point`, and
 
 This is a bug fix → patch bump: `2.1.0` → `2.1.1` (or include in `2.1.0` if that
 hasn't shipped yet). Add a `### Fixed` entry to the `[Unreleased]` CHANGELOG block.
+
+## Implementation notes (2026-03-07)
+
+- Gap chunks currently reuse the language `chunk_type` (for example `"cpp"`) rather
+  than introducing `*_context` values. This keeps existing downstream filters and
+  tests stable while still fixing the coverage bug.
+- For this delivery, versioning follows the explicit request to perform a **minor**
+  bump (`2.1.0` → `2.2.0`) even though this document originally suggested a patch bump.

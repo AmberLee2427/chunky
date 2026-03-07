@@ -62,7 +62,7 @@ Built-in chunkers
 * ``FortranChunker`` — captures `program`, `subroutine`, and `function` blocks with minimal heuristics.
 * ``RSTChunker`` — detects reStructuredText heading sections and chunks by section boundaries.
 * ``NotebookChunker`` — groups nb4llm notebook exports (`.nb.txt`) into markdown+code context chunks.
-* Tree-sitter chunkers (optional extra) for C/C++/HTML/Bash when the `tree` extra is installed.
+* Tree-sitter chunkers (optional extra) for C/C++/HTML/Bash when the `tree` extra is installed, with gap-filling so uncaptured lines are still emitted.
 * ``SlidingWindowChunker`` — deterministic line windows with configurable overlap.
 
 Chunk identifiers default to ``<doc_id>#chunk-0000``. Provide ``Document.metadata['doc_id']`` (or set

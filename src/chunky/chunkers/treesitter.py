@@ -7,7 +7,13 @@ from typing import Dict, Iterable, List, Optional
 
 from ..core import Chunker
 from ..types import Chunk, ChunkerConfig, Document
-from ._common import compute_line_boundaries, enforce_max_chars, finalize_chunks, make_chunk, resolve_doc_id
+from ._common import (
+    compute_line_boundaries,
+    enforce_max_chars,
+    finalize_chunks,
+    make_chunk,
+    resolve_doc_id,
+)
 from .fallback import SlidingWindowChunker
 
 try:  # pragma: no cover - optional dependency guard
@@ -73,17 +79,19 @@ class TreeSitterChunker(Chunker):
         if not source.strip():
             return self.fallback.chunk(document, config)
 
+        lines = source.splitlines()
+        total_lines = len(lines)
+        if total_lines == 0:
+            return self.fallback.chunk(document, config)
+
         try:
             tree = self._parser.parse(source.encode("utf-8"))
         except Exception:  # pragma: no cover - parser error
             return self.fallback.chunk(document, config)
 
         captures = self._query.captures(tree.root_node)
-        ranges = _select_ranges(captures, self.spec.capture_name)
-        if not ranges:
-            return self.fallback.chunk(document, config)
-
-        lines = source.splitlines()
+        captured_ranges = _select_ranges(captures, self.spec.capture_name)
+        ranges = _interleave_with_gaps(captured_ranges, total_lines)
         line_starts, line_ends = compute_line_boundaries(lines)
         doc_id = resolve_doc_id(document, config)
 
@@ -131,6 +139,29 @@ def _select_ranges(captures: Iterable[tuple], capture_name: str) -> List[tuple[i
         else:
             ranges.append((start, max(start + 1, end)))
     return ranges
+
+
+def _interleave_with_gaps(ranges: List[tuple[int, int]], total_lines: int) -> List[tuple[int, int]]:
+    """Return captured ranges plus uncovered gaps so all lines are emitted once."""
+
+    if total_lines <= 0:
+        return []
+
+    combined: List[tuple[int, int]] = []
+    cursor = 0
+    for start, end in ranges:
+        start = max(0, min(start, total_lines))
+        end = max(start, min(end, total_lines))
+        if end <= cursor:
+            continue
+        start = max(start, cursor)
+        if cursor < start:
+            combined.append((cursor, start))
+        combined.append((start, end))
+        cursor = end
+    if cursor < total_lines:
+        combined.append((cursor, total_lines))
+    return combined
 
 
 __all__ = ["TreeSitterSpec", "TreeSitterChunker"]
